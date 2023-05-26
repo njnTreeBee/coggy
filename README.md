@@ -11,7 +11,10 @@ PLEASE DO NOT TRY TO IMPLEMENT THIS INTO ANY PROJECT WITHOUT TALKING TO AN EXPER
 (NONE OF THIS IS REAL !  IT IS A LEARNING PROJECT EVERYTHING HERE IS PRETEND ! I DO NOT CONDONE THE USE OF ANY OF THESE FILES FOR ANY REASON !)
 
 ( DO NOT TRY ANY OF THESE FILES, IT COULD BE VERY DANGEROUS!!!)
-( Morales Cogito Machina ) (Coggy or cogi)
+
+( Morales Cogito Machina ) 
+
+(Coggy or cogi)
 
 (This AI system employs cryptographic keys placed strategically along the backbone of its knowledge base, or learning algorithms. These keys symbolize significant breakthroughs or heuristics that facilitate the unlocking of a more intricate understanding of the world surrounding it, mirroring the human experience of achieving cosmic consciousness or a higher state of awareness.
 
