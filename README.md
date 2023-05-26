@@ -1,6 +1,10 @@
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-WARNING SOME OF THESE FILES ARE VERY DANGEROUS PLEASE DO NOT TRY TO IMPLEMENT THIS INTO ANY PROJECT WITHOUT TALKING TO AN EXPERT!|
+                     WARNING
+
+ SOME OF THESE FILES ARE VERY DANGEROUS! 
+
+PLEASE DO NOT TRY TO IMPLEMENT THIS INTO ANY PROJECT WITHOUT TALKING TO AN EXPERT!|
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
