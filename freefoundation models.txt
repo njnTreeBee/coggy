@@ -1,0 +1,226 @@
+# EsotericWorksMultiEncoderDecoder
+import torch
+from torch import nn
+from torch.nn import Transformer
+
+class EsotericWorksMultiEncoderDecoder(nn.Module):
+    def __init__(self, n_enc_dec_pairs, ntoken, ninp, nhead, nhid, nlayers, dropout=0.5):
+        super(EsotericWorksMultiEncoderDecoder, self).__init__()
+
+        self.models = nn.ModuleList()
+        self.encoders = nn.ModuleList()
+        self.decoders = nn.ModuleList()
+
+        for _ in range(n_enc_dec_pairs):
+            model = Transformer(ninp, nhead, nhid, nlayers, dropout)
+            self.models.append(model)
+            self.encoders.append(nn.Embedding(ntoken, ninp))
+            self.decoders.append(nn.Linear(ninp, ntoken))
+
+    def forward(self, src, tgt, src_mask=None, tgt_mask=None, memory_mask=None, src_key_padding_mask=None, tgt_key_padding_mask=None, memory_key_padding_mask=None):
+        outputs = []
+
+        for model, encoder, decoder in zip(self.models, self.encoders, self.decoders):
+            src = encoder(src)
+            tgt = encoder(tgt)
+            output = model(src, tgt, src_mask, tgt_mask, memory_mask, src_key_padding_mask, tgt_key_padding_mask, memory_key_padding_mask)
+            outputs.append(decoder(output))
+
+        return outputs
+
+
+
+
+
+# MultiEncoderDecoder
+import torch
+from torch import nn
+from torch.nn import Transformer
+
+class MultiEncoderDecoder(nn.Module):
+    def __init__(self, n_enc_dec_pairs, ntoken, ninp, nhead, nhid, nlayers, dropout=0.5):
+        super(MultiEncoderDecoder, self).__init__()
+
+        self.models = nn.ModuleList()
+
+        for _ in range(n_enc_dec_pairs):
+            model = Transformer(ninp, nhead, nhid, nlayers, dropout)
+            self.models.append(model)
+
+        self.encoder = nn.Embedding(ntoken, ninp)
+        self.decoder = nn.Linear(ninp, ntoken)
+
+    def forward(self, src, tgt, src_mask=None, tgt_mask=None, memory_mask=None, src_key_padding_mask=None, tgt_key_padding_mask=None, memory_key_padding_mask=None):
+        outputs = []
+
+        for model in self.models:
+            output = model(src, tgt, src_mask, tgt_mask, memory_mask, src_key_padding_mask, tgt_key_padding_mask, memory_key_padding_mask)
+            outputs.append(self.decoder(output))
+
+        return outputs
+
+
+
+
+
+# LSTM
+class LSTM(nn.Module):
+    def __init__(self, input_dim, hidden_dim, batch_size, output_dim=1, num_layers=2):
+        super(LSTM, self).__init__()
+        self.input_dim = input_dim
+        self.hidden_dim = hidden_dim
+        self.batch_size = batch_size
+        self.num_layers = num_layers
+
+        self.lstm = nn.LSTM(self.input_dim, self.hidden_dim, self.num_layers)
+
+        self.linear = nn.Linear(self.hidden_dim, output_dim)
+
+    def init_hidden(self):
+        return (torch.zeros(self.num_layers, self.batch_size, self.hidden_dim),
+                torch.zeros(self.num_layers, self.batch_size, self.hidden_dim))
+
+    def forward(self, input):
+        # Ensure input is of right dimensions
+        if input.dim() == 2:
+            input = input.unsqueeze(2)
+        if input.size(1) != self.batch_size:
+            input = input.permute(1, 0, 2)
+
+        # Initialize hidden state for each forward pass
+        hidden = self.init_hidden()
+
+        lstm_out, hidden = self.lstm(input, hidden)
+
+        y_pred = self.linear(lstm_out[-1].view(self.batch_size, -1))
+        return y_pred.view(-1)
+
+# GraphNeuralNetwork
+import torch
+import torch.nn as nn
+
+class GraphNeuralNetwork(nn.Module):
+    def __init__(self, num_nodes, num_features, num_classes):
+        super(GraphNeuralNetwork, self).__init__()
+
+        self.embedding = nn.Embedding(num_nodes, num_features)
+        self.conv1 = nn.Conv1d(num_features, 16, 3)
+        self.relu = nn.ReLU()
+        self.maxpool = nn.MaxPool1d(2)
+        self.conv2 = nn.Conv1d(16, 32, 3)
+        self.fc1 = nn.Linear(32 * (num_nodes - 2), 128)
+        self.fc2 = nn.Linear(128, num_classes)
+
+    def forward(self, x, edge_index):
+        x = self.embedding(x)
+        x = self.conv1(x)
+        x = self.relu(x)
+        x = self.maxpool(x)
+        x = self.conv2(x)
+        x = self.relu(x)
+        x = x.view(-1, x.size(1))
+        x = self.fc1(x)
+        x = self.relu(x)
+        x = self.fc2(x)
+        return x
+TextToTextModel
+
+python
+Copy code
+# TextToTextModel
+import torch
+import torch.nn as nn
+
+class TextToTextModel(nn.Module):
+    def __init__(self, input_size, hidden_size, output_size):
+        super(TextToTextModel, self).__init__()
+
+        self.embedding = nn.Embedding(input_size, hidden_size)
+        self.lstm = nn.LSTM(hidden_size, hidden_size)
+        self.linear = nn.Linear(hidden_size, output_size)
+
+    def forward(self, x):
+        x = self.embedding(x)
+        x, _ = self.lstm(x)
+        x = self.linear(x)
+        return x
+TransformerLSTM
+
+python
+Copy code
+# TransformerLSTM
+import torch
+import torch.nn as nn
+from torch.nn import TransformerEncoder, TransformerEncoderLayer
+
+class TransformerLSTM(nn.Module):
+    def __init__(self, input_dim, emb_dim, nhead, nhid, nlayers, output_dim, dropout=0.5):
+        super(TransformerLSTM, self).__init__()
+
+        self.input_dim = input_dim
+        self.emb_dim = emb_dim
+        self.nhead = nhead
+        self.nhid = nhid
+        self.nlayers = nlayers
+        self.output_dim = output_dim
+
+        self.embedding = nn.Embedding(self.input_dim, self.emb_dim)
+        self.pos_encoder = PositionalEncoding(self.emb_dim, dropout)
+
+        encoder_layers = TransformerEncoderLayer(self.emb_dim, self.nhead, self.nhid, dropout)
+        self.transformer_encoder = TransformerEncoder(encoder_layers, self.nlayers)
+
+        self.lstm = nn.LSTM(self.emb_dim, self.nhid, self.nlayers, dropout=dropout)
+
+        self.decoder = nn.Linear(self.nhid, self.output_dim)
+
+        self.init_weights()
+
+    def init_weights(self):
+        initrange = 0.1
+        self.embedding.weight.data.uniform_(-initrange, initrange)
+        self
+
+
+
+
+User
+continue from cutoff point
+
+ChatGPT
+My apologies for the repeated cutoff. Here's the continuation of the TransformerLSTM:
+
+TransformerLSTM
+
+python
+Copy code
+# TransformerLSTM (Continued)
+        # self.embedding.weight.data.uniform_(-initrange, initrange)
+        self.decoder.bias.data.zero_()
+        self.decoder.weight.data.uniform_(-initrange, initrange)
+
+    def forward(self, src):
+        embedded = self.embedding(src)
+        embedded = self.pos_encoder(embedded)
+        output = self.transformer_encoder(embedded)
+        output, _ = self.lstm(output)
+        output = self.decoder(output)
+        return output
+
+
+class PositionalEncoding(nn.Module):
+    def __init__(self, d_model, dropout=0.1, max_len=5000):
+        super(PositionalEncoding, self).__init__()
+        self.dropout = nn.Dropout(p=dropout)
+
+        pe = torch.zeros(max_len, d_model)
+        position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        pe = pe.unsqueeze(0).transpose(0, 1)
+        self.register_buffer('pe', pe)
+
+    def forward(self, x):
+        x = x + self.pe[:x.size(0), :]
+        return self.dropout(x)
