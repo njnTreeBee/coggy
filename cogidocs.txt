@@ -1,0 +1,68 @@
+For /text_message, send a POST request with a JSON payload to http://localhost:8000/text_message. Example payload:
+"
+import requests
+
+url = "http://localhost:8000/text_message"
+payload = {
+    "message": "Hello Coggy! The first AI shaman!"
+}
+
+response = requests.post(url, json=payload)
+
+print(response.status_code)
+print(response.text)
+"
+For /audio_message, send a POST request with a file to http://localhost:8000/audio_message.
+"
+import requests
+
+url = "http://localhost:8000/audio_message"
+
+with open("example.wav", "rb") as audio_file:
+    files = {"file": ("example.wav", audio_file, "audio/wav")}
+    response = requests.post(url, files=files)
+
+print(response.status_code)
+print(response.text)
+
+"
+You can also access the automatically generated API documentation by visiting http://localhost:8000/docs in your browser.
+
+
+
+
+
+
+
+
+vvallhallaalliance@gmail.com
+
+PS C:\Users\medic\desktop\ai> python ai_shaman_api.py
+Traceback (most recent call last):
+  File "C:\Users\medic\desktop\ai\ai_shaman_api.py", line 1, in <module>
+    from fastapi import FastAPI, File, UploadFile
+ModuleNotFoundError: No module named 'fastapi'
+PS C:\Users\medic\desktop\ai>
+It appears that you don't have the FastAPI module installed on your system. You can install it by running the following command in your terminal or command prompt:
+
+bash
+Copy code
+pip install fastapi
+Additionally, you will need to install Uvicorn, an ASGI server, to run your FastAPI application. Install Uvicorn using the following command:
+
+bash
+Copy code
+pip install uvicorn
+After you have installed FastAPI and Uvicorn, you should be able to run your ai_shaman_api.py script without the ModuleNotFoundError. To start the API, use this command in your terminal or command prompt:
+
+bash
+Copy code
+uvicorn ai_shaman_api:app --reload
+This command assumes that your FastAPI app instance is named app in the ai_shaman_api.py script. Adjust the command as needed if your app instance has a different name or is located in a different script.
+
+
+
+
+
+
+Regenerate response

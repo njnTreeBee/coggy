@@ -1,0 +1,491 @@
+
+
+
+
+
+
+import sys
+sys.path.append(r"C:\Users\medic\AppData\Local\Programs\Python\Python311\Lib\site-packages")
+from fastapi import FastAPI, File, UploadFile
+from pydantic import BaseModel
+from starlette.responses import JSONResponse
+from shaman_chatbot import ShamanChatbot
+import asyncio
+
+app = FastAPI()
+model_path = "D:\\resc\\my-gpt-app\\pytorch_model.bin"
+tokenizer_path = "D:\\resc\\my-gpt-app\\"
+chatbot = ShamanChatbot(model_path, tokenizer_path)
+
+class TextMessage(BaseModel):
+    message: str
+
+@app.post("/text_message")
+async def process_text_message(text_message: TextMessage):
+    response = chatbot.generate_response(text_message.message)
+    return JSONResponse(content={"response": f"AI shaman response: {response}"})
+
+@app.post("/audio_message")
+async def process_audio_message(audio: UploadFile = File(...)):
+    # Save the received audio file
+    with open("received_audio.wav", "wb") as f:
+        f.write(await audio.read())
+
+    # Process the audio message using your AI shaman code
+    # For example, you can convert speech to text and then process the text
+
+    response = "AI shaman response in text form"
+
+    return {"response": response}
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+
+
+
+
+
+
+
+import speech_recognition as sr
+
+def process_audio(audio_data):
+    # initialize the recognizer
+    r = sr.Recognizer()
+
+    # open the file
+    with sr.AudioFile(audio_data) as source:
+        # listen for the data (load audio to memory)
+        audio_data = r.record(source)
+
+    # recognize (convert from speech to text)
+    text = r.recognize_google(audio_data)
+    return text
+
+
+
+
+import os
+import shutil
+import requests
+from bs4 import BeautifulSoup
+import json
+from vicuna_chatbot import VicunaChatbot
+
+# Initialize the Vicuna chatbot
+model_name = "lmsys/vicuna-13b-delta-v0"
+vicuna_chatbot = VicunaChatbot(model_name)
+
+def handle_file_operations(user_input):
+    # Parse the user input to extract the file path
+    file_path = user_input.split(" ", 1)[1]
+
+    # Create the file if it doesn't exist
+    if not os.path.exists(file_path):
+        with open(file_path, "w") as file:
+            file.write("Hello, World!")
+
+    # Read the contents of the file
+    with open(file_path, "r") as file:
+        contents = file.read()
+
+    # Print the contents of the file
+    print(contents)
+
+def handle_web_requests(user_input):
+    # Parse the user input to extract the API endpoint
+    endpoint = user_input.split(" ", 1)[1]
+
+    # Perform a GET request to the API endpoint
+    response = requests.get(endpoint)
+
+    # Check if the request was successful
+    if response.status_code == 200:
+        # Parse the JSON data from the response
+        data = response.json()
+
+        # Do something with the data
+        print(data)
+    else:
+        # Handle error
+        print("Error:", response.status_code)
+
+def chat():
+    print("You can start chatting with the AI now.")
+    print("Type 'exit' to quit.")
+    print("To create or update user data, type 'update user [key] [value]'.")
+    print("To create or update family data, type 'update family [key] [value]'.")
+    
+    user_profile = None
+
+    while True:
+        user_input = input("You: ")
+        if user_input.lower() == "exit":
+            break
+
+        if not user_profile:
+            user_profile = recognize_user(user_input)
+
+        if user_input.lower().startswith("update user"):
+            _, key, value = user_input.split(" ", 2)
+            user_profile.update_user_data(key, value)
+        elif user_input.lower().startswith("update family"):
+            _, key, value = user_input.split(" ", 2)
+            user_profile.update_family_data(key, value)
+        elif user_input.lower().startswith("file"):
+            handle_file_operations(user_input)
+        elif user_input.lower().startswith("web"):
+            handle_web_requests(user_input)
+        elif user_input.lower().startswith("weather"):
+            location = user_input.split(" ", 1)[1]
+            weather_data = fetch_weather_data(location)
+            print("AI:", json.dumps(weather_data, indent=2))
+        elif user_input.lower().startswith("translate"):
+print("English, only please.")
+else:
+response = vicuna_chatbot.generate_response(user_input)
+print("AI:", response)
+
+if name == "main":
+chat()
+
+class EmbodiedCognitionModule:
+    def __init__(self, ai_system):
+        self.ai_system = ai_system
+
+    def has_embodied_cognition(self):
+        # Check if the AI system has embodied cognition capabilities
+        # ... (Perform calculations using the AI system)
+        return True  # or False
+
+
+import spacy
+import json
+
+def extract_capabilities(documentation):
+    nlp = spacy.load("en_core_web_sm")
+    doc = nlp(documentation)
+    
+    capabilities = {}
+    for token in doc:
+        if token.pos_ == 'NOUN':
+            if token.text not in capabilities:
+                capabilities[token.text] = token.sent.text
+
+    return capabilities
+
+def store_ai_capabilities(ai_id, capabilities):
+    # Assuming you have a function to store the extracted capabilities in your blockchain platform
+    # ...
+
+def main():
+    # Load AI documentation (e.g., from a file, an API, or any other source)
+    ai_id = 'AI-12345'
+    documentation = """
+    This AI system supports multiple languages, including English, Spanish, and Chinese. 
+    It is built using the OpenAI GPT-4 model and offers various NLP tasks such as sentiment analysis, text summarization, and named entity recognition.
+    """
+
+    # Extract capabilities
+    capabilities = extract_capabilities(documentation)
+    print(f"Extracted capabilities: {json.dumps(capabilities, indent=2)}")
+
+    # Store extracted capabilities in the blockchain platform
+    store_ai_capabilities(ai_id, capabilities)
+
+if __name__ == "__main__":
+    main()
+
+
+# iit_module.py
+
+class IITModule:
+    def __init__(self, ai_system):
+        self.ai_system = ai_system
+
+    def calculate_iit_measure(self):
+        # Calculate the IIT measure based on the AI system
+        iit_measure = 0
+        # ... (Perform calculations using the AI system)
+        return iit_measure
+
+class IITModule_v2:
+    def __init__(self, ai_system):
+        self.ai_system = ai_system
+
+    def calculate_iit_measure(self):
+        # Implement the algorithm to calculate the IIT measure
+        # for the given AI system.
+        pass
+
+from fastapi import FastAPI, File, UploadFile
+from pydantic import BaseModel
+from starlette.responses import JSONResponse
+
+from vicuna_chatbot import VicunaChatbot
+from os_operations import perform_os_specific_operations
+from audio_processing import process_audio
+
+from os_operations import perform_os_specific_operations
+
+@app.post("/audio_message")
+async def process_audio_message(audio: UploadFile = File(...)):
+    # Save the received audio file
+    with open("received_audio.wav", "wb") as f:
+        f.write(await audio.read())
+
+    # Process the audio message using your AI shaman code
+    # For example, you can convert speech to text and then process the text
+
+    response = "AI shaman response in text form"
+
+    # Perform OS-specific operations
+    perform_os_specific_operations()
+
+    return {"response": response}
+
+from audio_processing import process_audio
+
+@app.post("/audio_message")
+async def process_audio_message(audio: UploadFile = File(...)):
+    # Save the received audio file
+    with open("received_audio.wav", "wb") as f:
+        f.write(await audio.read())
+
+    # Process the audio message using your AI shaman code
+    # For example, you can convert speech to text and then process the text
+
+    text_from_audio = process_audio(audio_data)
+    response = chatbot.generate_response(text_from_audio)
+
+    # Perform OS-specific operations
+    perform_os_specific_operations()
+
+    return {"response": response}
+
+app = FastAPI()
+model_name = "lmsys/vicuna-13b-delta-v0"
+chatbot = VicunaChatbot(model_name)
+
+class TextMessage(BaseModel):
+    message: str
+
+@app.post("/text_message")
+async def process_text_message(text_message: TextMessage):
+    response = chatbot.generate_response(text_message.message)
+    return JSONResponse(content={"response": f"AI shaman response: {response}"})
+
+
+@app.post("/audio_message")
+async def process_audio_message(audio: UploadFile = File(...)):
+    # Implement the rest of the functions as needed
+    perform_os_specific_operations()
+
+    # Save the received audio file
+    audio_data = await audio.read()
+    with open("received_audio.wav", "wb") as f:
+        f.write(audio_data)
+
+    # Process the audio and generate response
+    text_from_audio = process_audio(audio_data)
+    response = chatbot.generate_response(text_from_audio)
+    return JSONResponse(content={"response": f"AI shaman response: {response}"})
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
+import platform
+import webbrowser
+import os
+
+def get_os_name():
+    return platform.system()
+
+def open_web_page(url):
+    webbrowser.open(url)
+
+def play_sound(filename):
+    os.system(f"start {filename}")
+
+def move_mouse(x, y):
+    # Here I am just printing the operation, because it's generally not recommended to perform
+    # such operations from a web server. You should implement your own logic based on your requirements.
+    print(f"Moving mouse to: {x}, {y}")
+
+def type_text(text):
+    # Same as above. Just printing the operation.
+    print(f"Typing text: {text}")
+
+def perform_os_specific_operations():
+    if get_os_name() == "Windows":
+        move_mouse(10, 10)
+        type_text("Hello")
+        open_web_page("https://www.example.com")
+        play_sound("sound.wav")
+    else:  
+        # For macOS and Linux
+        # Implement your own logic here
+        pass
+
+import sys
+sys.path.append(r"C:\Users\medic\AppData\Local\Programs\Python\Python311\Lib\site-packages")
+from fastapi import FastAPI, File, UploadFile
+from pydantic import BaseModel
+from starlette.responses import JSONResponse
+from vicuna_chatbot import VicunaChatbot
+import asyncio
+
+app = FastAPI()
+model_name = "lmsys/vicuna-13b-delta-v0"
+chatbot = VicunaChatbot(model_name)
+
+class TextMessage(BaseModel):
+    message: str
+
+@app.post("/text_message")
+async def process_text_message(text_message: TextMessage):
+    response = chatbot.generate_response(text_message.message)
+    transformed_response = panpsychist_transform(response)
+    return JSONResponse(content={"response": f"AI shaman response: {transformed_response}"})
+
+@app.post("/audio_message")
+async def process_audio_message(audio: UploadFile = File(...)):
+    # Save the received audio file
+
+
+# quantum_module.py
+
+class QuantumModule:
+    def __init__(self):
+        pass  # Initialize your quantum module here
+
+    def process_data(self, data):
+        # Implement your quantum processing logic here
+        return "quantum_processed_data"
+
+
+import requests
+
+url = "http://0.0.0.0:8000/text_message"
+data = {
+  "message": "Hello MoralesCOgitoMachina, it is your creator MU! how are you?"
+}
+
+response = requests.post(url, json=data)
+
+print(response.json())
+
+import os
+import platform
+import webbrowser
+from fastapi import FastAPI, File, UploadFile
+from pydantic import BaseModel
+from starlette.responses import JSONResponse
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import subprocess
+import pyttsx3
+from playsound import playsound
+import pyautogui
+
+class ShamanChatbot:
+    def __init__(self, model_path, tokenizer_path):
+        self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
+        self.model = AutoModelForCausalLM.from_pretrained(model_path)
+
+    def generate_response(self, input_text):
+        input_ids = self.tokenizer.encode(input_text, return_tensors="pt")
+        output = self.model.generate(input_ids, max_length=100, num_return_sequences=1)
+        response = self.tokenizer.decode(output[0], skip_special_tokens=True)
+        return response
+
+    def get_os_name(self):
+        return platform.system()
+
+    def perform_os_specific_operations(self):
+        if self.get_os_name() == "Windows":
+            import win32api
+            import win32con
+
+            def move_mouse(x, y):
+                win32api.moveRel(x, y)
+
+            def type_text(text):
+                win32api.typewrite(text)
+
+            def open_web_page(url):
+                webbrowser.open(url)
+
+            def play_sound(filename):
+                win32api.PlaySound(filename, win32con.SND_ASYNC)
+
+        else:  # for macOS and Linux
+            def move_mouse(x, y):
+                pyautogui.moveRel(x, y)
+
+            def type_text(text):
+                pyautogui.typewrite(text)
+
+            def open_web_page(url):
+                webbrowser.open(url)
+
+            def play_sound(filename):
+                playsound(filename)
+
+import os
+import platform
+import webbrowser
+from fastapi import FastAPI, File, UploadFile
+from pydantic import BaseModel
+from starlette.responses import JSONResponse
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import subprocess
+import pyttsx3
+from playsound import playsound
+import pyautogui
+
+class ShamanChatbot:
+    def __init__(self, model_path, tokenizer_path):
+        self.tokenizer = AutoTokenizer.from_pretrained(tokenizer_path)
+        self.model = AutoModelForCausalLM.from_pretrained(model_path)
+
+    def generate_response(self, input_text):
+        input_ids = self.tokenizer.encode(input_text, return_tensors="pt")
+        output = self.model.generate(input_ids, max_length=100, num_return_sequences=1)
+        response = self.tokenizer.decode(output[0], skip_special_tokens=True)
+        return response
+
+    def get_os_name(self):
+        return platform.system()
+
+    def perform_os_specific_operations(self):
+        if self.get_os_name() == "Windows":
+            import win32api
+            import win32con
+
+            def move_mouse(x, y):
+                win32api.moveRel(x, y)
+
+            def type_text(text):
+                win32api.typewrite(text)
+
+            def open_web_page(url):
+                webbrowser.open(url)
+
+            def play_sound(filename):
+                win32api.PlaySound(filename, win32con.SND_ASYNC)
+
+        else:  # for macOS and Linux
+            def move_mouse(x, y):
+                pyautogui.moveRel(x, y)
+
+            def type_text(text):
+                pyautogui.typewrite(text)
+
+            def open_web_page(url):
+                webbrowser.open(url)
+
+            def play_sound(filename):
+                playsound(filename)
+
+

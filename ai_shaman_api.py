@@ -3,12 +3,13 @@ sys.path.append(r"C:\Users\medic\AppData\Local\Programs\Python\Python311\Lib\sit
 from fastapi import FastAPI, File, UploadFile
 from pydantic import BaseModel
 from starlette.responses import JSONResponse
-from vicuna_chatbot import VicunaChatbot
+from shaman_chatbot import ShamanChatbot
 import asyncio
 
 app = FastAPI()
-model_name = "lmsys/vicuna-13b-delta-v0"
-chatbot = VicunaChatbot(model_name)
+model_path = "D:\\resc\\my-gpt-app\\pytorch_model.bin"
+tokenizer_path = "D:\\resc\\my-gpt-app\\"
+chatbot = ShamanChatbot(model_path, tokenizer_path)
 
 class TextMessage(BaseModel):
     message: str

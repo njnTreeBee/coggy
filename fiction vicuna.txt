@@ -1,0 +1,165 @@
+import os
+import requests
+import sqlite3
+import nltk
+import spacy
+from email.message import EmailMessage
+import smtplib
+from sklearn.feature_extraction.text import CountVectorizer
+import tensorflow as tf
+from keras.models import Sequential
+from keras.layers import Dense
+from playsound import playsound
+from rasa.nlu.training_data import load_data
+from rasa.nlu.config import RasaNLUModelConfig
+from rasa.nlu.model import Trainer
+from rasa.nlu import config
+from textblob import TextBlob
+import pyttsx3
+import speech_recognition as sr
+from gtts import gTTS
+from bs4 import BeautifulSoup
+import scrapy
+import matplotlib.pyplot as plt
+import seaborn as sns
+import plotly.express as px
+from pydantic import BaseModel
+from starlette.responses import JSONResponse
+from fastapi import FastAPI, HTTPException
+from transformers import AutoTokenizer, AutoModelForCausalLM
+import pyautogui
+
+
+# API Keys for third-party services
+OPEN_WEATHER_MAP_API_KEY = "<open-weather-map-api-key>"
+NEWS_API_KEY = "<news-api-key>"
+JOKE_API_URL = "https://v2.jokeapi.dev/joke/Any"
+NASA_API_KEY = "<NASA-API-KEY>"
+
+DATABASE_URL = "sqlite:///./test.db"
+
+engine = create_engine(
+    DATABASE_URL
+)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+app = FastAPI()
+
+class CommandInput(BaseModel):
+    command: str
+
+class EmailData(BaseModel):
+    recipient: str
+    subject: str
+    body: str
+
+class DatabaseData(BaseModel):
+    query: str
+
+class WeatherForecastInput(BaseModel):
+    city: str
+
+class NewsHeadlinesInput(BaseModel):
+    country: str
+    category: str
+
+class FileHandler:
+    def __init__(self, base_path):
+        self.base_path = base_path
+
+    def read_file(self, file_path):
+        with open(os.path.join(self.base_path, file_path), 'r') as f:
+            return f.read()
+
+    def write_file(self, file_path, content):
+        with open(os.path.join(self.base_path, file_path), 'w') as f:
+            f.write(content)
+        return {"message": "File written successfully"}
+
+    def delete_file(self, file_path):
+        os.remove(os.path.join(self.base_path, file_path))
+        return {"message": "File deleted successfully"}
+
+file_handler = FileHandler('/path/to/your/directory')
+
+@app.post("/read_file/")
+async def read_file(file_path: str):
+    return {"file_content": file_handler.read_file(file_path)}
+
+@app.post("/write_file/")
+async def write_file(file_path: str, content: str):
+    return file_handler.write_file(file_path, content)
+
+@app.post("/delete_file/")
+async def delete_file(file_path: str):
+    return file_handler.delete_file(file_path)
+
+@app.get("/apod")
+def apod():
+    response = requests.get(f"https://api.nasa.gov/planetary/apod?api_key={NASA_API_KEY}")
+    return response.json()
+
+@app.get("/mars_rover_photos")
+def mars_rover_photos(sol: int, camera: str):
+    response = requests.get(f"https://api.nasa.gov/mars-photos/api/v1/rovers/curiosity/photos?sol={sol}&camera={camera}&api_key={NASA_API_KEY}")
+    return response.json()
+
+@app.get("/neo_feed")
+def neo_feed(start_date: str, end_date: str):
+    response = requests.get(f"https://api.nasa.gov/neo/rest/v1/feed?start_date={start_date}&end_date={end_date}&api_key={NASA_API_KEY}")
+    return response.json()
+
+@app.get("/earth_imagery")
+def earth_imagery(lon: float, lat: float):
+    response = requests.get(f"https://api.nasa.gov/planetary/earth/imagery?lon={lon}&lat={lat}&api_key={NASA_API_KEY}")
+    return response.json()
+
+@app.post("/execute_query/")
+async def execute_query(data: DatabaseData):
+    db = SessionLocal()
+    try:
+        result = db.execute(data.query)
+        db.commit()
+        return {"result": result.fetchall()}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=400, detail=str(e))
+    finally:
+        db.close()
+
+@app.post("/send_email/")
+async def send_email(data: EmailData):
+    email_handler.send_email(data.recipient, data.subject, data.body)
+    return {"message": "Email sent successfully"}
+
+@app.post("/get_forecast/")
+async def get_forecast(data: WeatherForecastInput):
+    return {"forecast": weather_forecast.get_forecast(data.city)}
+
+@app.post("/get_headlines/")
+async def get_headlines(data: NewsHeadlinesInput):
+    return {"headlines": news_headlines.get_headlines(data.country, data.category)}
+
+@app.get("/get_joke/")
+async def get_joke():
+    return {"joke": random_joke.get_joke()}
+
+@app.post("/execute_command/")
+async def execute_command(command_input: CommandInput):
+    try:
+        output = subprocess.check_output(command_input.command, shell=True, stderr=subprocess.STDOUT)
+        return output.decode()
+    except subprocess.CalledProcessError as e:
+        logging.error(f"Error executing command: {e.output.decode()}")
+        raise HTTPException(status_code=500, detail=e.output.decode())
+
+
+FROM tiangolo/uvicorn-gunicorn-fastapi:python3.7
+
+WORKDIR /app
+
+COPY ./app /app
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+
