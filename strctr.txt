@@ -1,0 +1,37 @@
+agi
+
+├── checkpoints
+
+├── data
+
+│ ├── avsd_train.json
+
+│ ├── avsd_val.json
+
+│ ├── generated_examples_avsd.json
+
+│ ├── val_options.json
+
+│ └── alpaca_data.json
+
+├── models
+
+│ ├── AI_Shaman_model.py
+
+│ ├── EsotericWorksMultiEncoderDecoder.py
+
+│ ├── GraphNeuralNetwork.py
+
+│ ├── integrated_model.py
+
+│ ├── LSTM.py
+
+│ ├── MultiEncoderDecoder.py
+
+│ ├── TextToTextModel.py
+
+│ └── TransformerLSTM.py
+
+├── model_code
+
+└── train.py
